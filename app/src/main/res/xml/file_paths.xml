@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <cache-path name="invoices_pdf" path="invoices/" />
+    <cache-path name="reports" path="reports/" />
+    <files-path name="brand_assets" path="brand_assets/" />
+    <files-path name="expense_receipts" path="expense_receipts/" />
+    <files-path name="staff_documents" path="staff_documents/" />
+</paths>

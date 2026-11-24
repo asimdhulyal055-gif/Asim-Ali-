@@ -1,0 +1,140 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "erp": {
+      "users": {
+        "$uid": {
+          ".read": "auth != null && (auth.uid === $uid || (root.child('erp/users/' + auth.uid + '/isActive').val() === true && (root.child('erp/users/' + auth.uid + '/roleCode').val() === 'SUPER_ADMIN' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'OWNER' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'ADMIN')))",
+          ".write": "auth != null && root.child('erp/users/' + auth.uid + '/isActive').val() === true && (root.child('erp/users/' + auth.uid + '/roleCode').val() === 'SUPER_ADMIN' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'OWNER' || (root.child('erp/users/' + auth.uid + '/roleCode').val() === 'ADMIN' && newData.child('roleCode').val() !== 'SUPER_ADMIN' && newData.child('roleCode').val() !== 'OWNER' && (!data.exists() || (data.child('roleCode').val() !== 'SUPER_ADMIN' && data.child('roleCode').val() !== 'OWNER'))))",
+          ".validate": "newData.hasChildren(['uid', 'email', 'roleCode', 'branchId', 'isActive']) && newData.child('uid').val() === $uid && newData.child('email').isString() && newData.child('roleCode').isString() && newData.child('branchId').isString() && newData.child('isActive').isBoolean()"
+        }
+      },
+      "security": {
+        "role_policies": {
+          "$roleCode": {
+            ".read": "auth != null && root.child('erp/users/' + auth.uid + '/isActive').val() === true",
+            ".write": "auth != null && root.child('erp/users/' + auth.uid + '/isActive').val() === true && (root.child('erp/users/' + auth.uid + '/roleCode').val() === 'SUPER_ADMIN' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'OWNER' || (root.child('erp/users/' + auth.uid + '/roleCode').val() === 'ADMIN' && $roleCode !== 'SUPER_ADMIN' && $roleCode !== 'OWNER'))",
+            ".validate": "newData.hasChildren(['roleCode', 'updatedAt']) && newData.child('roleCode').val() === $roleCode"
+          }
+        }
+      },
+      "devices": {
+        "$deviceId": {
+          ".read": "auth != null && root.child('erp/users/' + auth.uid + '/isActive').val() === true && (data.child('operatorUid').val() === auth.uid || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'SUPER_ADMIN' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'OWNER' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'ADMIN')",
+          ".write": "auth != null && root.child('erp/users/' + auth.uid + '/isActive').val() === true && ((!data.exists() && newData.child('operatorUid').val() === auth.uid && newData.child('isAuthorized').val() === true) || (data.child('operatorUid').val() === auth.uid && data.child('isAuthorized').val() === true && newData.child('isAuthorized').val() === true) || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'SUPER_ADMIN' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'OWNER' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'ADMIN')",
+          ".validate": "newData.hasChildren(['deviceId', 'operatorUid', 'branchId', 'isAuthorized', 'lastSeenAt']) && newData.child('deviceId').val() === $deviceId && newData.child('isAuthorized').isBoolean()"
+        }
+      },
+      "branches": {
+        "$branchId": {
+          ".read": "auth != null && root.child('erp/users/' + auth.uid + '/isActive').val() === true && (root.child('erp/users/' + auth.uid + '/roleCode').val() === 'SUPER_ADMIN' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'OWNER' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'ADMIN' || root.child('erp/users/' + auth.uid + '/branchId').val() === $branchId)",
+          "meta": {
+            ".write": "auth != null && root.child('erp/users/' + auth.uid + '/isActive').val() === true && (root.child('erp/users/' + auth.uid + '/roleCode').val() === 'SUPER_ADMIN' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'OWNER' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'ADMIN')"
+          },
+          "orders": {
+            "$recordId": {
+              ".write": "auth != null && root.child('erp/users/' + auth.uid + '/isActive').val() === true && (root.child('erp/users/' + auth.uid + '/roleCode').val() === 'SUPER_ADMIN' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'OWNER' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'ADMIN' || (root.child('erp/users/' + auth.uid + '/branchId').val() === $branchId && (!data.exists() || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'BRANCH_MANAGER')))",
+              ".validate": "newData.hasChildren(['entityId', 'branchId', 'version', 'checksumSha256', 'updatedAt']) && newData.child('branchId').val() === $branchId && newData.child('version').isNumber()"
+            }
+          },
+          "invoices": {
+            "$recordId": {
+              ".write": "auth != null && root.child('erp/users/' + auth.uid + '/isActive').val() === true && (root.child('erp/users/' + auth.uid + '/roleCode').val() === 'SUPER_ADMIN' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'OWNER' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'ADMIN' || (root.child('erp/users/' + auth.uid + '/branchId').val() === $branchId && !data.exists()))",
+              ".validate": "newData.hasChildren(['entityId', 'branchId', 'version', 'checksumSha256', 'updatedAt']) && newData.child('branchId').val() === $branchId"
+            }
+          },
+          "accounting": {
+            "$recordId": {
+              ".read": "auth != null && root.child('erp/users/' + auth.uid + '/isActive').val() === true && (root.child('erp/users/' + auth.uid + '/roleCode').val() === 'SUPER_ADMIN' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'OWNER' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'ADMIN' || (root.child('erp/users/' + auth.uid + '/branchId').val() === $branchId && root.child('erp/users/' + auth.uid + '/roleCode').val() === 'BRANCH_MANAGER'))",
+              ".write": "auth != null && root.child('erp/users/' + auth.uid + '/isActive').val() === true && (root.child('erp/users/' + auth.uid + '/roleCode').val() === 'SUPER_ADMIN' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'OWNER' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'ADMIN' || (root.child('erp/users/' + auth.uid + '/branchId').val() === $branchId && root.child('erp/users/' + auth.uid + '/roleCode').val() === 'BRANCH_MANAGER' && !data.exists()))",
+              ".validate": "newData.hasChildren(['entityId', 'branchId', 'version', 'checksumSha256', 'updatedAt']) && newData.child('branchId').val() === $branchId"
+            }
+          },
+          "payroll": {
+            "$recordId": {
+              ".read": "auth != null && root.child('erp/users/' + auth.uid + '/isActive').val() === true && (root.child('erp/users/' + auth.uid + '/roleCode').val() === 'SUPER_ADMIN' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'OWNER' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'ADMIN' || (root.child('erp/users/' + auth.uid + '/branchId').val() === $branchId && (root.child('erp/users/' + auth.uid + '/roleCode').val() === 'BRANCH_MANAGER' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'HR')))",
+              ".write": "auth != null && root.child('erp/users/' + auth.uid + '/isActive').val() === true && (root.child('erp/users/' + auth.uid + '/roleCode').val() === 'SUPER_ADMIN' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'OWNER' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'ADMIN' || (root.child('erp/users/' + auth.uid + '/branchId').val() === $branchId && root.child('erp/users/' + auth.uid + '/roleCode').val() === 'HR' && !data.exists()))",
+              ".validate": "newData.hasChildren(['entityId', 'branchId', 'version', 'checksumSha256', 'updatedAt']) && newData.child('branchId').val() === $branchId"
+            }
+          },
+          "customers": {
+            "$recordId": {
+              ".write": "auth != null && root.child('erp/users/' + auth.uid + '/isActive').val() === true && (root.child('erp/users/' + auth.uid + '/roleCode').val() === 'SUPER_ADMIN' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'OWNER' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'ADMIN' || root.child('erp/users/' + auth.uid + '/branchId').val() === $branchId)",
+              ".validate": "newData.hasChildren(['entityId', 'branchId', 'version', 'checksumSha256', 'updatedAt']) && newData.child('branchId').val() === $branchId"
+            }
+          },
+          "menu": {
+            "$recordId": {
+              ".write": "auth != null && root.child('erp/users/' + auth.uid + '/isActive').val() === true && (root.child('erp/users/' + auth.uid + '/roleCode').val() === 'SUPER_ADMIN' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'OWNER' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'ADMIN' || (root.child('erp/users/' + auth.uid + '/branchId').val() === $branchId && root.child('erp/users/' + auth.uid + '/roleCode').val() === 'BRANCH_MANAGER'))",
+              ".validate": "newData.hasChildren(['entityId', 'branchId', 'version', 'checksumSha256', 'updatedAt']) && newData.child('branchId').val() === $branchId"
+            }
+          },
+          "inventory": {
+            "$recordId": {
+              ".write": "auth != null && root.child('erp/users/' + auth.uid + '/isActive').val() === true && (root.child('erp/users/' + auth.uid + '/roleCode').val() === 'SUPER_ADMIN' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'OWNER' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'ADMIN' || (root.child('erp/users/' + auth.uid + '/branchId').val() === $branchId && (root.child('erp/users/' + auth.uid + '/roleCode').val() === 'BRANCH_MANAGER' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'INVENTORY_MANAGER')))",
+              ".validate": "newData.hasChildren(['entityId', 'branchId', 'version', 'checksumSha256', 'updatedAt']) && newData.child('branchId').val() === $branchId"
+            }
+          },
+          "suppliers": {
+            "$recordId": {
+              ".write": "auth != null && root.child('erp/users/' + auth.uid + '/isActive').val() === true && (root.child('erp/users/' + auth.uid + '/roleCode').val() === 'SUPER_ADMIN' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'OWNER' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'ADMIN' || (root.child('erp/users/' + auth.uid + '/branchId').val() === $branchId && (root.child('erp/users/' + auth.uid + '/roleCode').val() === 'BRANCH_MANAGER' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'INVENTORY_MANAGER' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'PURCHASE_STAFF')))",
+              ".validate": "newData.hasChildren(['entityId', 'branchId', 'version', 'checksumSha256', 'updatedAt']) && newData.child('branchId').val() === $branchId"
+            }
+          },
+          "purchases": {
+            "$recordId": {
+              ".write": "auth != null && root.child('erp/users/' + auth.uid + '/isActive').val() === true && (root.child('erp/users/' + auth.uid + '/roleCode').val() === 'SUPER_ADMIN' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'OWNER' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'ADMIN' || (root.child('erp/users/' + auth.uid + '/branchId').val() === $branchId && (root.child('erp/users/' + auth.uid + '/roleCode').val() === 'BRANCH_MANAGER' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'INVENTORY_MANAGER' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'PURCHASE_STAFF')))",
+              ".validate": "newData.hasChildren(['entityId', 'branchId', 'version', 'checksumSha256', 'updatedAt']) && newData.child('branchId').val() === $branchId"
+            }
+          },
+          "expenses": {
+            "$recordId": {
+              ".write": "auth != null && root.child('erp/users/' + auth.uid + '/isActive').val() === true && (root.child('erp/users/' + auth.uid + '/roleCode').val() === 'SUPER_ADMIN' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'OWNER' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'ADMIN' || (root.child('erp/users/' + auth.uid + '/branchId').val() === $branchId && root.child('erp/users/' + auth.uid + '/roleCode').val() === 'BRANCH_MANAGER'))",
+              ".validate": "newData.hasChildren(['entityId', 'branchId', 'version', 'checksumSha256', 'updatedAt']) && newData.child('branchId').val() === $branchId"
+            }
+          },
+          "staff": {
+            "$recordId": {
+              ".write": "auth != null && root.child('erp/users/' + auth.uid + '/isActive').val() === true && (root.child('erp/users/' + auth.uid + '/roleCode').val() === 'SUPER_ADMIN' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'OWNER' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'ADMIN' || (root.child('erp/users/' + auth.uid + '/branchId').val() === $branchId && (root.child('erp/users/' + auth.uid + '/roleCode').val() === 'BRANCH_MANAGER' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'HR')))",
+              ".validate": "newData.hasChildren(['entityId', 'branchId', 'version', 'checksumSha256', 'updatedAt']) && newData.child('branchId').val() === $branchId"
+            }
+          },
+          "attendance": {
+            "$recordId": {
+              ".write": "auth != null && root.child('erp/users/' + auth.uid + '/isActive').val() === true && (root.child('erp/users/' + auth.uid + '/roleCode').val() === 'SUPER_ADMIN' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'OWNER' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'ADMIN' || root.child('erp/users/' + auth.uid + '/branchId').val() === $branchId)",
+              ".validate": "newData.hasChildren(['entityId', 'branchId', 'version', 'checksumSha256', 'updatedAt']) && newData.child('branchId').val() === $branchId"
+            }
+          },
+          "loyalty": {
+            "$recordId": {
+              ".read": "auth != null && root.child('erp/users/' + auth.uid + '/isActive').val() === true && (root.child('erp/users/' + auth.uid + '/roleCode').val() === 'SUPER_ADMIN' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'OWNER' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'ADMIN' || root.child('erp/users/' + auth.uid + '/branchId').val() === $branchId)",
+              ".write": "auth != null && root.child('erp/users/' + auth.uid + '/isActive').val() === true && (root.child('erp/users/' + auth.uid + '/roleCode').val() === 'SUPER_ADMIN' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'OWNER' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'ADMIN' || (root.child('erp/users/' + auth.uid + '/branchId').val() === $branchId && (root.child('erp/users/' + auth.uid + '/roleCode').val() === 'BRANCH_MANAGER' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'CASHIER')))",
+              ".validate": "newData.hasChildren(['entityId', 'branchId', 'version', 'checksumSha256', 'updatedAt']) && newData.child('branchId').val() === $branchId"
+            }
+          },
+          "sync_ledger": {
+            "$txId": {
+              ".write": "auth != null && root.child('erp/users/' + auth.uid + '/isActive').val() === true && !data.exists() && (root.child('erp/users/' + auth.uid + '/roleCode').val() === 'SUPER_ADMIN' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'OWNER' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'ADMIN' || root.child('erp/users/' + auth.uid + '/branchId').val() === $branchId)",
+              ".validate": "newData.hasChildren(['transactionId', 'branchId', 'entityType', 'entityId', 'checksumSha256', 'actorUid', 'createdAt']) && newData.child('actorUid').val() === auth.uid"
+            }
+          }
+        }
+      },
+      "backups": {
+        "$backupId": {
+          ".read": "auth != null && root.child('erp/users/' + auth.uid + '/isActive').val() === true && (root.child('erp/users/' + auth.uid + '/roleCode').val() === 'SUPER_ADMIN' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'OWNER' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'ADMIN')",
+          ".write": "auth != null && root.child('erp/users/' + auth.uid + '/isActive').val() === true && !data.exists() && (root.child('erp/users/' + auth.uid + '/roleCode').val() === 'SUPER_ADMIN' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'OWNER' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'ADMIN')",
+          ".validate": "newData.hasChildren(['backupId', 'schemaVersion', 'checksumSha256', 'createdByUid', 'createdAt']) && newData.child('backupId').val() === $backupId && newData.child('createdByUid').val() === auth.uid"
+        }
+      },
+      "audit_logs": {
+        "$logId": {
+          ".read": "auth != null && root.child('erp/users/' + auth.uid + '/isActive').val() === true && (root.child('erp/users/' + auth.uid + '/roleCode').val() === 'SUPER_ADMIN' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'OWNER' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'ADMIN' || root.child('erp/users/' + auth.uid + '/roleCode').val() === 'BRANCH_MANAGER')",
+          ".write": "auth != null && root.child('erp/users/' + auth.uid + '/isActive').val() === true && !data.exists()",
+          ".validate": "newData.hasChildren(['actorUid', 'branchId', 'action', 'timestamp']) && newData.child('actorUid').val() === auth.uid"
+        }
+      }
+    }
+  }
+}
